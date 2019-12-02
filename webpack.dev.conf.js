@@ -1,10 +1,11 @@
 const webpack = require("webpack");
-const merge = require("webpack");
+const merge = require("webpack-merge");
 const baseWebpackConfig = require("./webpack.base.conf");
 const devWebpackConfig = merge(baseWebpackConfig, {
   mode: "development",
-  davetool: "cheap-module-eval-source-map",
+  devtool: "cheap-module-eval-source-map",
   devServer: {
+    contentBase: baseWebpackConfig.externals.paths.dist, //отвечает этот параметр за то, где юудет открываться веб пак
     port: 8081, // по дефолту 8080, однако хорошей практикой принято ставить 8081, потому что иногда будет работа со вторым сервером (php noda), и чтобы не было ошибки, ставим 8081
     overlay: {
       warnings: true,
