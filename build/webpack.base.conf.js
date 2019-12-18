@@ -1,4 +1,5 @@
 // в этом файле описываются конфигурации для нашего веб пака
+const fs = require("fs");
 const path = require("path"); // делает рекваир (практически все что мы прописываем через рекваир, это мы обращаемся к package.json);
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -10,6 +11,12 @@ const PATHS = {
   dist: path.join(__dirname, "../dist"), // при билде меняем на паблик - public
   assets: "assets/" // при билде меняем на статик - static
 };
+
+const PAGES_DIR = `${PATHS.src}/pug/pages/`;
+const PAGES = fs
+  .readdirSync(PAGES_DIR)
+  .filter(fileName => fileName.endsWith(".pug"));
+
 module.exports = {
   // здесь экспортируем все наши настройки
 
@@ -37,6 +44,12 @@ module.exports = {
         test: /\.js$/, //регулярка на то, что мы будем проверять. Обратились через легулярку ко всем js файлам
         loader: "babel-loader", // подключаем лодер
         exclude: "/node_modules" //чтобы ускорить нашу компиляцию, мы будем исключать какие-либо файлы
+      },
+      {
+        //правила
+        test: /\.pug$/, //регулярка на то, что мы будем проверять. Обратились через легулярку ко всем pug файлам
+        loader: "pug-loader" // подключаем лодер
+        // exclude: "/node_modules" //чтобы ускорить нашу компиляцию, мы будем исключать какие-либо файлы, однако она закомментированна поскольку, мы не будем импортировать паг из нод модулес, так как это нам ничего не даст
       },
       {
         test: /\.(png|jpg|gif|svg)$/, //регулярка на то, что мы будем проверять. Обратились через легулярку ко всем js файлам
@@ -101,15 +114,17 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: `${PATHS.assets}css/[name].css`
     }),
-    new HtmlWebpackPlugin({
-      hash: false,
-      template: `${PATHS.src}/index.html`,
-      filename: "./index.html"
-    }),
     new CopyWebpackPlugin([
       { from: `${PATHS.src}/${PATHS.assets}img`, to: `${PATHS.assets}img` },
       { from: `${PATHS.src}/${PATHS.assets}fonts`, to: `${PATHS.assets}fonts` },
       { from: `${PATHS.src}/static`, to: "" }
-    ])
+    ]),
+    ...PAGES.map(
+      page =>
+        new HtmlWebpackPlugin({
+          template: `${PAGES_DIR}/${page}`,
+          filename: `./${page.replace(/\.pug/, ".html")}`
+        })
+    )
   ]
 };

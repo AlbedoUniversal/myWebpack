@@ -1,8 +1,5 @@
-.main {
+.wrapper {
   max-width: $desktopWidth;
   margin: 0 auto;
-  .content {
-    height: 500px;
-    background-color: #e3e3e3;
-  }
+  background-color: green;
 }
