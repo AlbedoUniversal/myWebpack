@@ -6,9 +6,9 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const PATHS = {
   // лучше сразу вывести пути в константу; а зачем мы его поджключаем, если он уже есть в ноде? да просто так принято
-  src: path.join(__dirname, "./src"),
-  dist: path.join(__dirname, "./dist"),
-  assets: "assets/"
+  src: path.join(__dirname, "../src"),
+  dist: path.join(__dirname, "../dist"), // при билде меняем на паблик - public
+  assets: "assets/" // при билде меняем на статик - static
 };
 module.exports = {
   // здесь экспортируем все наши настройки
@@ -46,6 +46,13 @@ module.exports = {
         }
       },
       {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        loader: "file-loader",
+        options: {
+          name: "[name].[ext]"
+        }
+      },
+      {
         test: /\.scss$/,
         use: [
           "style-loader",
@@ -58,7 +65,7 @@ module.exports = {
             loader: "postcss-loader",
             options: {
               sourceMap: true,
-              config: { path: "src/js/postcss.config.js" }
+              config: { path: `./js/postcss.config.js` }
             }
           },
           {
@@ -80,7 +87,7 @@ module.exports = {
             loader: "postcss-loader",
             options: {
               sourceMap: true,
-              config: { path: "src/js/postcss.config.js" }
+              config: { path: `./postcss.config.js` }
             }
           }
         ]
@@ -100,7 +107,8 @@ module.exports = {
       filename: "./index.html"
     }),
     new CopyWebpackPlugin([
-      { from: `${PATHS.src}/img`, to: `${PATHS.assets}img` },
+      { from: `${PATHS.src}/${PATHS.assets}img`, to: `${PATHS.assets}img` },
+      { from: `${PATHS.src}/${PATHS.assets}fonts`, to: `${PATHS.assets}fonts` },
       { from: `${PATHS.src}/static`, to: "" }
     ])
   ]
