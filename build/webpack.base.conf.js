@@ -8,8 +8,8 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const PATHS = {
   // лучше сразу вывести пути в константу; а зачем мы его поджключаем, если он уже есть в ноде? да просто так принято
   src: path.join(__dirname, "../src"),
-  dist: path.join(__dirname, "../dist"), // при билде меняем на паблик - public
-  assets: "assets/" // при билде меняем на статик - static
+  dist: path.join(__dirname, "../dist"),
+  assets: "assets/"
 };
 
 const PAGES_DIR = `${PATHS.src}/pug/pages/`;
@@ -32,10 +32,22 @@ module.exports = {
   output: {
     // точка выхода,
     // filename: "[name].js", // почему [name]? потому что, если у нас будет несколько точек входа, то вылезит ошибка. Чтобыв ее не было, пишем [name], который берется из текущего ярлыка
-    filename: `${PATHS.assets}js/[name].js`,
+    filename: `${PATHS.assets}js/[name].[contenthash].js`,
     // path: path.resolve(__dirname, "./dist"), // путь, здесь используем тот самый пакет, который устанавливали path. Зачем он? - webpack ищет путь точку входа с самого корня, если это винда то с диска ц и так далее. И для того, чтобы он искал этот путь наиболее корректно. Поэтому мы к нему обращаемся и через метод resolve передаем два параметра 1-ый дирнайм, и название папки дист, чтобы она создавалась здесь
     path: PATHS.dist, // cмотри строку 19
     publicPath: "/" // нужен для дев сервера, чтобы он корректно работал
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          name: "vendors",
+          test: /node_modules/,
+          chunks: "all",
+          enforce: true
+        }
+      }
+    }
   },
   module: {
     rules: [
@@ -112,7 +124,7 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: `${PATHS.assets}css/[name].css`
+      filename: `${PATHS.assets}css/[name].[contenthash].css`
     }),
     new CopyWebpackPlugin([
       { from: `${PATHS.src}/${PATHS.assets}img`, to: `${PATHS.assets}img` },
